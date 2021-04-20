@@ -178,10 +178,18 @@ gdip_pen_setup (GpGraphics *graphics, GpPen *pen)
 	 */
 	if (pen == graphics->last_pen && !pen->changed)
 		return Ok;
-
-	if (pen->width < 1.0) { /* we draw a pixel wide line if width is < 1.0 */
+	/* JOYOJ打印操作票时不能打印细线，故去掉该判断，修改为下面方式
+	if (pen->width < 1.0) { // we draw a pixel wide line if width is < 1.0
 		double widthy = 1.0;
 		widthx = 1.0;
+
+		cairo_device_to_user_distance (graphics->ct, &widthx, &widthy);
+	} else {
+		widthx = (double) pen->width;
+	}*/
+	if (pen->width < 0.0) { // we draw a pixel wide line if width is < 0.0 避免线宽小于0时出现绘制异常
+		double widthy = 0.1;
+		widthx = 0.1;
 
 		cairo_device_to_user_distance (graphics->ct, &widthx, &widthy);
 	} else {

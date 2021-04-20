@@ -40,6 +40,23 @@
  */
 
 #undef DRAWSTRING_DEBUG
+BOOL IsUnicodeSpace(char *c)
+{
+    char c1 = *c;
+    c++;
+    char c2 = *c;
+    if(c2 != 0)
+       	return FALSE;
+    
+    char comp[] = {' ', '\t', '\n', '\r', '\v', '\f'};
+    int i;
+    for (i = 0; i < 6; i++)
+    {
+       	if (c1 == comp[i])
+            return TRUE;
+    }
+    return FALSE;
+}
 
 static int
 CalculateStringWidths (cairo_t *ct, GDIPCONST GpFont *gdiFont, GDIPCONST gunichar2 *stringUnicode, unsigned long StringDetailElements, GpStringDetailStruct *StringDetails)
@@ -254,7 +271,7 @@ MeasureString (GpGraphics *graphics, GDIPCONST WCHAR *stringUnicode, int *length
 
 	/* unless specified we don't consider the trailing spaces, unless there is just one space (#80680) */
 	if ((format->formatFlags & StringFormatFlagsMeasureTrailingSpaces) == 0) {
-		while ((StringLen > 0) && (isspace ((int) ( *(Src + StringLen - 1)))))
+		while ((StringLen > 0) && (IsUnicodeSpace ( (char*) (Src + StringLen - 1)))) //(isspace ((int) ((unsigned char) *(Src + StringLen - 1))))) //add by joyoj@20200627 解决JOYOJ部分字符无法正常显示问题
 			StringLen--;
 		if (StringLen == 0)
 			StringLen = 1;
